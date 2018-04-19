@@ -1,15 +1,17 @@
-package grupo3.rcmm.wifi_indoor_positioning_client
+package grupo3.rcmm.wifi_indoor_positioning_client.ui
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.wifi.ScanResult
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.widget.Toast
+import grupo3.rcmm.wifi_indoor_positioning_client.data.model.AccessPointMeasurement
+import grupo3.rcmm.wifi_indoor_positioning_client.data.event.AccessPointsEvent
+import grupo3.rcmm.wifi_indoor_positioning_client.R
+import grupo3.rcmm.wifi_indoor_positioning_client.data.service.WifiService
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode

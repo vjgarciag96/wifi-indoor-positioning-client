@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client
+package grupo3.rcmm.wifi_indoor_positioning_client.data.event
 
 import android.net.wifi.ScanResult
 

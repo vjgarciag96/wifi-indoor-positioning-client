@@ -1,14 +1,13 @@
-package grupo3.rcmm.wifi_indoor_positioning_client
+package grupo3.rcmm.wifi_indoor_positioning_client.data.service
 
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.os.IBinder
 import android.util.Log
+import grupo3.rcmm.wifi_indoor_positioning_client.data.event.AccessPointsEvent
 import org.greenrobot.eventbus.EventBus
-import java.util.ArrayList
 
 /**
  * Created by victor on 19/04/18.
