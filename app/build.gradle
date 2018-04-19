@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -30,6 +31,11 @@ dependencies {
 
     //Event Bus
     compile "org.greenrobot:eventbus:$eventbus_version"
+
+    //Google Maps API
+    compile "com.google.android.gms:play-services-maps:$play_services_version"
+    compile "com.google.android.gms:play-services:$play_services_version"
+    compile "com.google.android.gms:play-services-location:$play_services_version"
 
     testCompile 'junit:junit:4.12'
 

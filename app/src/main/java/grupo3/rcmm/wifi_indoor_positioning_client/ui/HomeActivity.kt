@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.widget.Toast
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
 import grupo3.rcmm.wifi_indoor_positioning_client.data.model.AccessPointMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.event.AccessPointsEvent
 import grupo3.rcmm.wifi_indoor_positioning_client.R
@@ -15,17 +18,26 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.service.WifiService
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.MapFragment
 
-class HomeActivity : AppCompatActivity() {
 
-    val TAG: String = "Home Activity"
 
-    val REQUEST_PERMISSION_CODE: Int = 1
+
+class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    private val TAG: String = "Home Activity"
+
+    private val REQUEST_PERMISSION_CODE: Int = 1
+
+    private lateinit var googleMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        loadGoogleMap()
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             startListeningWifi()
         else {
             val accessCoarseLocationPermission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -59,22 +71,36 @@ class HomeActivity : AppCompatActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onAccessPointsMeasured(apMeasurements: AccessPointsEvent){
+    fun onAccessPointsMeasured(apMeasurements: AccessPointsEvent) {
         val formattedMeasurements = mutableListOf<AccessPointMeasurement>()
-        for (accesPoint in apMeasurements.accessPoints){
+        for (accesPoint in apMeasurements.accessPoints) {
             formattedMeasurements.add(AccessPointMeasurement(accesPoint.BSSID, accesPoint.level))
         }
         Log.d(TAG, formattedMeasurements.toString())
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        when(requestCode){
+        when (requestCode) {
             REQUEST_PERMISSION_CODE -> {
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     startListeningWifi()
                 else
                     Toast.makeText(this, "Necesitas conceder permisos para utilizar la app", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun loadGoogleMap() {
+        val mapFragment = fragmentManager
+                .findFragmentById(R.id.map) as MapFragment
+        mapFragment.getMapAsync(this)
+    }
+
+    override fun onMapReady(map: GoogleMap?) {
+        if (map != null) {
+            map.addMarker(MarkerOptions()
+                    .position(LatLng(39.478896, -6.34246)))
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.478896, -6.34246), 100f))
         }
     }
 }
