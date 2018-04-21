@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/positioning"
+            android:title="Posicionamiento" />
+        <item
+            android:id="@+id/waypoints"
+            android:title="Waypoints" />
+        <item
+            android:id="@+id/fingerprinting"
+            android:title="Fingerprinting" />
+    </group>
+
+    <item
+        android:id="@+id/navigation_subheader"
+        android:title="Otras opciones">
+        <menu>
+            <item
+                android:id="@+id/menu_opcion_1"
+                android:title="Opción 1" />
+            <item
+                android:id="@+id/menu_opcion_2"
+                android:title="Opción 2" />
+        </menu>
+    </item>
+</menu>
