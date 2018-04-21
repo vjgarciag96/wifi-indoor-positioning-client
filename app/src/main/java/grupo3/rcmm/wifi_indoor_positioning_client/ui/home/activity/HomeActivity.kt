@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.ui
+package grupo3.rcmm.wifi_indoor_positioning_client.ui.home.activity
 
 import android.Manifest
 import android.content.Intent
@@ -6,11 +6,15 @@ import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import grupo3.rcmm.wifi_indoor_positioning_client.data.model.AccessPointMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.event.AccessPointsEvent
 import grupo3.rcmm.wifi_indoor_positioning_client.R
@@ -20,34 +24,29 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_layout.*
+import com.google.android.gms.maps.MapFragment
 
-class HomeActivity : AppCompatActivity() {
+
+class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val TAG: String = "Home Activity"
 
     private val REQUEST_PERMISSION_CODE: Int = 1
 
+    private lateinit var map: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         initViewListeners()
         initNavigationDrawer()
-        setBaseFragment()
+        loadGoogleMap()
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             startListeningWifi()
         else {
             val accessCoarseLocationPermission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
             ActivityCompat.requestPermissions(this, accessCoarseLocationPermission, REQUEST_PERMISSION_CODE)
         }
-    }
-
-    private fun setBaseFragment() {
-        val baseFragment = MapFragment.newInstance()
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.add(R.id.content_frame, baseFragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
     }
 
     private fun initViewListeners() {
@@ -98,13 +97,20 @@ class HomeActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun loadGoogleMap() {
+        val mapFragment = fragmentManager
+                .findFragmentById(R.id.map) as MapFragment
+        mapFragment.getMapAsync(this)
+    }
+
     override fun onStart() {
         super.onStart()
         EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
-        EventBus.getDefault().unregister(this)
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this)
         super.onStop()
     }
 
@@ -141,5 +147,12 @@ class HomeActivity : AppCompatActivity() {
                     Toast.makeText(this, "Necesitas conceder permisos para utilizar la app", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        this.map = map
+        map.addMarker(MarkerOptions()
+                .position(LatLng(39.478896, -6.34246)))
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.478896, -6.34246), 100f))
     }
 }
