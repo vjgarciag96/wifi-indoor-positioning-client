@@ -5,8 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.util.Log
 import android.view.MenuItem
@@ -27,6 +27,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val REQUEST_PERMISSION_CODE: Int = 1
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -41,7 +42,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun setBaseFragment(){
+    private fun setBaseFragment() {
         val baseFragment = MapFragment.newInstance()
         val transaction = supportFragmentManager.beginTransaction()
         transaction.add(R.id.content_frame, baseFragment)
