@@ -63,13 +63,8 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setNavigationListeners() {
         home_drawer_left.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.positioning -> {
-                    setTitle(getString(R.string.positioning))
-                    //TODO change UI to positioning
-                }
-                R.id.waypoints -> {
-                    showWaypointsView()
-                }
+                R.id.positioning -> showPositioningView()
+                R.id.waypoints -> showWaypointsView()
                 R.id.fingerprinting -> {
                     setTitle(getString(R.string.fingerprinting))
                     //TODO change UI to fingerprinting
@@ -157,9 +152,19 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.478896, -6.34246), 100f))
     }
 
-    private fun showWaypointsView(){
-        setTitle(getString(R.string.waypoints))
+    private fun showPositioningView(){
+        hideWaypointsView()
+        setTitle(getString(R.string.positioning))
+        positioning_button.visibility = View.VISIBLE
+    }
+
+    private fun hidePositioningView(){
         positioning_button.visibility = View.INVISIBLE
+    }
+
+    private fun showWaypointsView(){
+        hidePositioningView()
+        setTitle(getString(R.string.waypoints))
         waypoint_buttons_container.visibility = View.VISIBLE
         add_waypoint_button.setOnClickListener(View.OnClickListener {
             add_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_add_marker_red))
@@ -169,5 +174,9 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             add_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_add_marker_black))
             delete_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_delete_marker_red))
         })
+    }
+
+    private fun hideWaypointsView(){
+        waypoint_buttons_container.visibility = View.INVISIBLE
     }
 }
