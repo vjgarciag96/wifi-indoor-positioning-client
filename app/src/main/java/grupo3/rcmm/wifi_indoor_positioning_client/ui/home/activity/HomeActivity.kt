@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,6 +26,7 @@ import org.greenrobot.eventbus.ThreadMode
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_layout.*
 import com.google.android.gms.maps.MapFragment
+import kotlinx.android.synthetic.main.map_layout.*
 
 
 class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -66,8 +68,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
                     //TODO change UI to positioning
                 }
                 R.id.waypoints -> {
-                    setTitle(getString(R.string.waypoints))
-                    //TODO change UI to waypoints CRUD
+                    showWaypointsView()
                 }
                 R.id.fingerprinting -> {
                     setTitle(getString(R.string.fingerprinting))
@@ -154,5 +155,19 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         map.addMarker(MarkerOptions()
                 .position(LatLng(39.478896, -6.34246)))
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.478896, -6.34246), 100f))
+    }
+
+    private fun showWaypointsView(){
+        setTitle(getString(R.string.waypoints))
+        positioning_button.visibility = View.INVISIBLE
+        waypoint_buttons_container.visibility = View.VISIBLE
+        add_waypoint_button.setOnClickListener(View.OnClickListener {
+            add_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_add_marker_red))
+            delete_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_delete_marker_black))
+        })
+        delete_waypoint_button.setOnClickListener(View.OnClickListener {
+            add_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_add_marker_black))
+            delete_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_delete_marker_red))
+        })
     }
 }
