@@ -1,21 +1,23 @@
 package grupo3.rcmm.wifi_indoor_positioning_client.ui.home.activity
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Vibrator
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import grupo3.rcmm.wifi_indoor_positioning_client.data.model.AccessPointMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.event.AccessPointsEvent
 import grupo3.rcmm.wifi_indoor_positioning_client.R
@@ -26,6 +28,8 @@ import org.greenrobot.eventbus.ThreadMode
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_layout.*
 import com.google.android.gms.maps.MapFragment
+import com.google.android.gms.maps.model.*
+import grupo3.rcmm.wifi_indoor_positioning_client.common.MapScreen
 import kotlinx.android.synthetic.main.map_layout.*
 
 
@@ -36,6 +40,12 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     private val REQUEST_PERMISSION_CODE: Int = 1
 
     private lateinit var map: GoogleMap
+
+    private var currentScreen: Int = MapScreen.POSITIONING.ordinal
+
+    private lateinit var vibrator: Vibrator
+
+    private lateinit var deleteMarkerPosition: LatLng
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +59,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             val accessCoarseLocationPermission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
             ActivityCompat.requestPermissions(this, accessCoarseLocationPermission, REQUEST_PERMISSION_CODE)
         }
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
     private fun initViewListeners() {
@@ -65,10 +76,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             when (it.itemId) {
                 R.id.positioning -> showPositioningView()
                 R.id.waypoints -> showWaypointsView()
-                R.id.fingerprinting -> {
-                    setTitle(getString(R.string.fingerprinting))
-                    //TODO change UI to fingerprinting
-                }
+                R.id.fingerprinting -> showFingerprintingView()
             }
             home_drawer_layout.closeDrawers()
             true
@@ -147,36 +155,86 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
         this.map = map
-        map.addMarker(MarkerOptions()
+        map.setOnMapLongClickListener {
+            if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
+                val mapMarker = map.addMarker(MarkerOptions()
+                        .position(it))
+                mapMarker.setDraggable(true)
+                mapMarker.setZIndex(1000F)
+            }
+        }
+        map.setOnMarkerClickListener {
+            if (currentScreen == MapScreen.WAYPOINTS.ordinal)
+                it.remove()
+            true
+        }
+        map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
+            override fun onMarkerDrag(p0: Marker?) {
+                var markerScreenPosition: Point? = null
+                if (p0 != null)
+                    markerScreenPosition = map.projection.toScreenLocation(p0.position)
+                if(overlap(markerScreenPosition!!, delete_button))
+                    delete_button.setImageResource(R.drawable.ic_delete)
+                else
+                    delete_button.setImageResource(R.drawable.ic_delete_black)
+            }
+
+            override fun onMarkerDragEnd(p0: Marker?) {
+                delete_button.setVisibility(View.INVISIBLE)
+                var markerScreenPosition: Point? = null
+                if (p0 != null)
+                    markerScreenPosition = map.projection.toScreenLocation(p0.position)
+                if (overlap(markerScreenPosition!!, delete_button))
+                    p0!!.remove()
+                else
+                    p0!!.setPosition(deleteMarkerPosition);
+            }
+
+            override fun onMarkerDragStart(p0: Marker?) {
+                delete_button.setVisibility(View.VISIBLE)
+                if (p0 != null)
+                    deleteMarkerPosition = p0.position
+            }
+
+        })
+        val mapMarker = map.addMarker(MarkerOptions()
                 .position(LatLng(39.478896, -6.34246)))
+        mapMarker.setDraggable(true)
+        mapMarker.setZIndex(1000F)
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.478896, -6.34246), 100f))
     }
 
-    private fun showPositioningView(){
+    private fun showPositioningView() {
         hideWaypointsView()
+        currentScreen = MapScreen.POSITIONING.ordinal
         setTitle(getString(R.string.positioning))
         positioning_button.visibility = View.VISIBLE
     }
 
-    private fun hidePositioningView(){
+    private fun hidePositioningView() {
         positioning_button.visibility = View.INVISIBLE
     }
 
-    private fun showWaypointsView(){
+    private fun showWaypointsView() {
         hidePositioningView()
+        currentScreen = MapScreen.WAYPOINTS.ordinal
         setTitle(getString(R.string.waypoints))
-        waypoint_buttons_container.visibility = View.VISIBLE
-        add_waypoint_button.setOnClickListener(View.OnClickListener {
-            add_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_add_marker_red))
-            delete_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_delete_marker_black))
-        })
-        delete_waypoint_button.setOnClickListener(View.OnClickListener {
-            add_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_add_marker_black))
-            delete_waypoint_button.setImageDrawable(getDrawable(R.drawable.ic_delete_marker_red))
-        })
     }
 
-    private fun hideWaypointsView(){
-        waypoint_buttons_container.visibility = View.INVISIBLE
+    private fun hideWaypointsView() {
+    }
+
+    private fun showFingerprintingView() {
+        currentScreen = MapScreen.FINGERPRINTING.ordinal
+        setTitle(getString(R.string.fingerprinting))
+    }
+
+    private fun overlap(point: Point, imgview: ImageView): Boolean {
+        var imgCoords: IntArray = IntArray(2);
+        imgview.getLocationOnScreen(imgCoords);
+        Log.e(TAG, " ****** Img x:" + imgCoords[0] + " y:" + imgCoords[1] + "    Point x:" + point.x + "  y:" + point.y + " Width:" + imgview.getWidth() + " Height:" + imgview.getHeight());
+        val overlapX: Boolean = point.x < imgCoords[0] + imgview.getWidth() && point.x > imgCoords[0] - imgview.getWidth();
+        val overlapY: Boolean = point.y < imgCoords[1] + imgview.getHeight() && point.y > imgCoords[1] - imgview.getWidth();
+        return overlapX && overlapY;
     }
 }
