@@ -1,8 +1,8 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.api.Services;
+package grupo3.rcmm.wifi_indoor_positioning_client.data.api.services;
 
-import grupo3.rcmm.wifi_indoor_positioning_client.api.API_Client;
-import grupo3.rcmm.wifi_indoor_positioning_client.api.API_Interface;
-import grupo3.rcmm.wifi_indoor_positioning_client.api.Listeners.FingerprintServiceInteractor;
+import grupo3.rcmm.wifi_indoor_positioning_client.data.api.APIClient;
+import grupo3.rcmm.wifi_indoor_positioning_client.data.api.APIInterface;
+import grupo3.rcmm.wifi_indoor_positioning_client.data.api.listeners.FingerprintServiceInteractor;
 import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Fingerprint;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -17,7 +17,7 @@ public class FingerprintService implements FingerprintServiceInteractor {
 
     @Override
     public void postFingerprint(Fingerprint fingerprint) {
-        API_Interface api_interface = API_Client.getClient();
+        APIInterface api_interface = APIClient.getClient();
 
         Call<Void> call = api_interface.postFingerprint(fingerprint);
 

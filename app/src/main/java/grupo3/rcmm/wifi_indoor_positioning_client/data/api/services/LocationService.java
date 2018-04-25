@@ -1,8 +1,8 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.api.Services;
+package grupo3.rcmm.wifi_indoor_positioning_client.data.api.services;
 
-import grupo3.rcmm.wifi_indoor_positioning_client.api.API_Client;
-import grupo3.rcmm.wifi_indoor_positioning_client.api.API_Interface;
-import grupo3.rcmm.wifi_indoor_positioning_client.api.Listeners.LocationServiceInteractor;
+import grupo3.rcmm.wifi_indoor_positioning_client.data.api.APIClient;
+import grupo3.rcmm.wifi_indoor_positioning_client.data.api.APIInterface;
+import grupo3.rcmm.wifi_indoor_positioning_client.data.api.listeners.LocationServiceInteractor;
 import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Location;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -17,7 +17,7 @@ public class LocationService implements LocationServiceInteractor {
 
     @Override
     public void postLocation(Location location) {
-        API_Interface api_interface = API_Client.getClient();
+        APIInterface api_interface = APIClient.getClient();
 
         Call<Void> call = api_interface.postLocation(location);
         call.enqueue(new Callback<Void>() {

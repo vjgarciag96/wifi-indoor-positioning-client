@@ -39,6 +39,10 @@ dependencies {
     compile "com.google.android.gms:play-services:$play_services_version"
     compile "com.google.android.gms:play-services-location:$play_services_version"
 
+    //Room
+    compile "android.arch.persistence.room:runtime:$arch_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$arch_version"
+
     testCompile 'junit:junit:4.12'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

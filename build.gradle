@@ -29,4 +29,5 @@ project.ext{
     android_libraries_version = "27+"
     eventbus_version = "3.1.1"
     play_services_version = "11.0.4"
+    arch_version = "1.0.0-rc1"
 }

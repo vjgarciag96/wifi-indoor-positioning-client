@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.api
+package grupo3.rcmm.wifi_indoor_positioning_client.data.api
 
 import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Fingerprint
 import retrofit2.Call

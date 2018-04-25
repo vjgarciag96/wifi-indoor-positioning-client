@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.api.Listeners;
+package grupo3.rcmm.wifi_indoor_positioning_client.data.api.listeners;
 
 import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Location;
 import retrofit2.Call;

@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_layout.*
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.model.*
-import grupo3.rcmm.wifi_indoor_positioning_client.common.MapScreen
+import grupo3.rcmm.wifi_indoor_positioning_client.common.menu.MenuScreens
 import kotlinx.android.synthetic.main.map_layout.*
 
 
@@ -42,11 +42,13 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
 
-    private var currentScreen: Int = MapScreen.POSITIONING.ordinal
+    private var currentScreen: Int = MenuScreens.POSITIONING.ordinal
 
     private lateinit var vibrator: Vibrator
 
     private lateinit var deleteMarkerPosition: LatLng
+
+    private var firstVibrator: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,7 +153,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         this.map = map
         drawFloorPlan()
         map.setOnMapLongClickListener {
-            if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
+            if (currentScreen == MenuScreens.WAYPOINTS.ordinal) {
                 val mapMarker = map.addMarker(MarkerOptions()
                         .position(it))
                 mapMarker.setDraggable(true)
@@ -159,12 +161,12 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         map.setOnMarkerClickListener {
-            if (currentScreen == MapScreen.WAYPOINTS.ordinal)
+            if (currentScreen == MenuScreens.WAYPOINTS.ordinal)
                 it.remove()
             true
         }
         map.setOnMarkerClickListener {
-            if (currentScreen == MapScreen.FINGERPRINTING.ordinal) {
+            if (currentScreen == MenuScreens.FINGERPRINTING.ordinal) {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
                     startListeningWifi()
                 else {
@@ -176,21 +178,25 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
             override fun onMarkerDrag(p0: Marker?) {
-                if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
+                if (currentScreen == MenuScreens.WAYPOINTS.ordinal) {
                     var markerScreenPosition: Point? = null
                     if (p0 != null)
                         markerScreenPosition = map.projection.toScreenLocation(p0.position)
                     if (overlap(markerScreenPosition!!, delete_button)) {
                         delete_button.setImageResource(R.drawable.ic_delete)
                         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                        vibrator.vibrate(100)
-                    } else
+                        if(firstVibrator)
+                            vibrator.vibrate(100)
+                        firstVibrator = false
+                    } else {
                         delete_button.setImageResource(R.drawable.ic_delete_black)
+                        firstVibrator = true
+                    }
                 }
             }
 
             override fun onMarkerDragEnd(p0: Marker?) {
-                if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
+                if (currentScreen == MenuScreens.WAYPOINTS.ordinal) {
                     delete_button.setVisibility(View.INVISIBLE)
                     var markerScreenPosition: Point? = null
                     if (p0 != null)
@@ -204,7 +210,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onMarkerDragStart(p0: Marker?) {
-                if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
+                if (currentScreen == MenuScreens.WAYPOINTS.ordinal) {
                     delete_button.setVisibility(View.VISIBLE)
                     if (p0 != null)
                         deleteMarkerPosition = p0.position
@@ -212,15 +218,11 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
         })
-        val mapMarker = map.addMarker(MarkerOptions()
-                .position(LatLng(39.478896, -6.34246)))
-        mapMarker.setDraggable(true)
-        mapMarker.setZIndex(1000F)
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.478896, -6.34246), 100f))
     }
 
     private fun showPositioningView() {
-        currentScreen = MapScreen.POSITIONING.ordinal
+        currentScreen = MenuScreens.POSITIONING.ordinal
         setTitle(getString(R.string.positioning))
         positioning_button.visibility = View.VISIBLE
     }
@@ -231,12 +233,12 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun showWaypointsView() {
         hidePositioningView()
-        currentScreen = MapScreen.WAYPOINTS.ordinal
+        currentScreen = MenuScreens.WAYPOINTS.ordinal
         setTitle(getString(R.string.waypoints))
     }
 
     private fun showFingerprintingView() {
-        currentScreen = MapScreen.FINGERPRINTING.ordinal
+        currentScreen = MenuScreens.FINGERPRINTING.ordinal
         hidePositioningView()
         setTitle(getString(R.string.fingerprinting))
     }
@@ -244,7 +246,6 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun overlap(point: Point, imgview: ImageView): Boolean {
         var imgCoords = IntArray(2);
         imgview.getLocationOnScreen(imgCoords);
-        Log.e(TAG, " ****** Img x:" + imgCoords[0] + " y:" + imgCoords[1] + "    Point x:" + point.x + "  y:" + point.y + " Width:" + imgview.getWidth() + " Height:" + imgview.getHeight());
         val overlapX: Boolean = point.x < imgCoords[0] + imgview.getWidth() && point.x > imgCoords[0] - imgview.getWidth();
         val overlapY: Boolean = point.y < imgCoords[1] + imgview.getHeight() && point.y > imgCoords[1] - imgview.getWidth();
         return overlapX && overlapY;
