@@ -1,7 +1,7 @@
 package grupo3.rcmm.wifi_indoor_positioning_client.api;
 
-import grupo3.rcmm.wifi_indoor_positioning_client.data.Fingerprint;
-import grupo3.rcmm.wifi_indoor_positioning_client.data.Location;
+import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Fingerprint;
+import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Location;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -53,13 +54,6 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         initViewListeners()
         initNavigationDrawer()
         loadGoogleMap()
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            startListeningWifi()
-        else {
-            val accessCoarseLocationPermission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
-            ActivityCompat.requestPermissions(this, accessCoarseLocationPermission, REQUEST_PERMISSION_CODE)
-        }
-        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
     private fun initViewListeners() {
@@ -155,6 +149,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
         this.map = map
+        drawFloorPlan()
         map.setOnMapLongClickListener {
             if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
                 val mapMarker = map.addMarker(MarkerOptions()
@@ -168,32 +163,52 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
                 it.remove()
             true
         }
+        map.setOnMarkerClickListener {
+            if (currentScreen == MapScreen.FINGERPRINTING.ordinal) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                    startListeningWifi()
+                else {
+                    val accessCoarseLocationPermission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    ActivityCompat.requestPermissions(this, accessCoarseLocationPermission, REQUEST_PERMISSION_CODE)
+                }
+            }
+            true
+        }
         map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
             override fun onMarkerDrag(p0: Marker?) {
-                var markerScreenPosition: Point? = null
-                if (p0 != null)
-                    markerScreenPosition = map.projection.toScreenLocation(p0.position)
-                if(overlap(markerScreenPosition!!, delete_button))
-                    delete_button.setImageResource(R.drawable.ic_delete)
-                else
-                    delete_button.setImageResource(R.drawable.ic_delete_black)
+                if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
+                    var markerScreenPosition: Point? = null
+                    if (p0 != null)
+                        markerScreenPosition = map.projection.toScreenLocation(p0.position)
+                    if (overlap(markerScreenPosition!!, delete_button)) {
+                        delete_button.setImageResource(R.drawable.ic_delete)
+                        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                        vibrator.vibrate(100)
+                    } else
+                        delete_button.setImageResource(R.drawable.ic_delete_black)
+                }
             }
 
             override fun onMarkerDragEnd(p0: Marker?) {
-                delete_button.setVisibility(View.INVISIBLE)
-                var markerScreenPosition: Point? = null
-                if (p0 != null)
-                    markerScreenPosition = map.projection.toScreenLocation(p0.position)
-                if (overlap(markerScreenPosition!!, delete_button))
-                    p0!!.remove()
-                else
-                    p0!!.setPosition(deleteMarkerPosition);
+                if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
+                    delete_button.setVisibility(View.INVISIBLE)
+                    var markerScreenPosition: Point? = null
+                    if (p0 != null)
+                        markerScreenPosition = map.projection.toScreenLocation(p0.position)
+                    if (overlap(markerScreenPosition!!, delete_button))
+                        p0!!.remove()
+                    else
+                        p0!!.setPosition(deleteMarkerPosition);
+                    delete_button.setImageResource(R.drawable.ic_delete_black)
+                }
             }
 
             override fun onMarkerDragStart(p0: Marker?) {
-                delete_button.setVisibility(View.VISIBLE)
-                if (p0 != null)
-                    deleteMarkerPosition = p0.position
+                if (currentScreen == MapScreen.WAYPOINTS.ordinal) {
+                    delete_button.setVisibility(View.VISIBLE)
+                    if (p0 != null)
+                        deleteMarkerPosition = p0.position
+                }
             }
 
         })
@@ -205,7 +220,6 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun showPositioningView() {
-        hideWaypointsView()
         currentScreen = MapScreen.POSITIONING.ordinal
         setTitle(getString(R.string.positioning))
         positioning_button.visibility = View.VISIBLE
@@ -221,20 +235,31 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         setTitle(getString(R.string.waypoints))
     }
 
-    private fun hideWaypointsView() {
-    }
-
     private fun showFingerprintingView() {
         currentScreen = MapScreen.FINGERPRINTING.ordinal
+        hidePositioningView()
         setTitle(getString(R.string.fingerprinting))
     }
 
     private fun overlap(point: Point, imgview: ImageView): Boolean {
-        var imgCoords: IntArray = IntArray(2);
+        var imgCoords = IntArray(2);
         imgview.getLocationOnScreen(imgCoords);
         Log.e(TAG, " ****** Img x:" + imgCoords[0] + " y:" + imgCoords[1] + "    Point x:" + point.x + "  y:" + point.y + " Width:" + imgview.getWidth() + " Height:" + imgview.getHeight());
         val overlapX: Boolean = point.x < imgCoords[0] + imgview.getWidth() && point.x > imgCoords[0] - imgview.getWidth();
         val overlapY: Boolean = point.y < imgCoords[1] + imgview.getHeight() && point.y > imgCoords[1] - imgview.getWidth();
         return overlapX && overlapY;
+    }
+
+    private fun drawFloorPlan() {
+        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.plano)
+        map.addGroundOverlay(GroundOverlayOptions()
+                .image(BitmapDescriptorFactory.fromBitmap(bitmap))
+                .bearing(15.837358248031318F + 180F)
+                .transparency(0.5F)
+                .position(LatLng(39.47896890365607, -6.34215496480465),
+                        32.68545310545363f,
+                        83.33159181033633f))
+
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(38.65563582451349, -6.376890242099763), 100f))
     }
 }
