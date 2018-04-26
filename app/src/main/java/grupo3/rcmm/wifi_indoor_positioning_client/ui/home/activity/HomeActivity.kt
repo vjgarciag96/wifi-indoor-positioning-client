@@ -31,6 +31,10 @@ import kotlinx.android.synthetic.main.content_layout.*
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.model.*
 import grupo3.rcmm.wifi_indoor_positioning_client.common.menu.MenuScreens
+import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.DBThreadExecutor
+import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Waypoint
+import grupo3.rcmm.wifi_indoor_positioning_client.data.persistence.local.dao.WaypointsDao
+import grupo3.rcmm.wifi_indoor_positioning_client.data.persistence.local.db.WaypointsDatabase
 import kotlinx.android.synthetic.main.map_layout.*
 
 
@@ -49,6 +53,8 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var deleteMarkerPosition: LatLng
 
     private var firstVibrator: Boolean = true
+
+    private val waypoints: MutableList<Waypoint> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,12 +117,12 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onStop() {
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this)
+        saveWaypoints()
         super.onStop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopListeningWifi()
     }
 
     private fun startListeningWifi() {
@@ -135,7 +141,14 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         for (accesPoint in apMeasurements.accessPoints) {
             formattedMeasurements.add(AccessPointMeasurement(accesPoint.BSSID, accesPoint.level))
         }
-        Log.d(TAG, formattedMeasurements.toString())
+        saveMeasurements(formattedMeasurements)
+    }
+
+    private fun saveMeasurements(measurements: List<AccessPointMeasurement>) {
+        for (measurement: AccessPointMeasurement in measurements) {
+            Log.d("database", measurement.mac)
+            //TODO send data to API
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -152,6 +165,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap) {
         this.map = map
         drawFloorPlan()
+        loadWaypoints()
         map.setOnMapLongClickListener {
             if (currentScreen == MenuScreens.WAYPOINTS.ordinal) {
                 val mapMarker = map.addMarker(MarkerOptions()
@@ -159,6 +173,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
                 mapMarker.setDraggable(true)
                 mapMarker.setZIndex(1000F)
             }
+            waypoints.add(Waypoint(it.latitude, it.longitude))
         }
         map.setOnMarkerClickListener {
             if (currentScreen == MenuScreens.WAYPOINTS.ordinal)
@@ -185,7 +200,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (overlap(markerScreenPosition!!, delete_button)) {
                         delete_button.setImageResource(R.drawable.ic_delete)
                         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                        if(firstVibrator)
+                        if (firstVibrator)
                             vibrator.vibrate(100)
                         firstVibrator = false
                     } else {
@@ -218,7 +233,6 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
         })
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.478896, -6.34246), 100f))
     }
 
     private fun showPositioningView() {
@@ -244,11 +258,11 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun overlap(point: Point, imgview: ImageView): Boolean {
-        var imgCoords = IntArray(2);
-        imgview.getLocationOnScreen(imgCoords);
-        val overlapX: Boolean = point.x < imgCoords[0] + imgview.getWidth() && point.x > imgCoords[0] - imgview.getWidth();
-        val overlapY: Boolean = point.y < imgCoords[1] + imgview.getHeight() && point.y > imgCoords[1] - imgview.getWidth();
-        return overlapX && overlapY;
+        var imgCoords = IntArray(2)
+        imgview.getLocationOnScreen(imgCoords)
+        val overlapX: Boolean = point.x < imgCoords[0] + imgview.getWidth() && point.x > imgCoords[0] - imgview.getWidth()
+        val overlapY: Boolean = point.y < imgCoords[1] + imgview.getHeight() && point.y > imgCoords[1] - imgview.getWidth()
+        return overlapX && overlapY
     }
 
     private fun drawFloorPlan() {
@@ -261,6 +275,40 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
                         32.68545310545363f,
                         83.33159181033633f))
 
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(38.65563582451349, -6.376890242099763), 100f))
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.47896890365607, -6.34215496480465), 19f))
+    }
+
+    private fun loadWaypoints() {
+        val executor = DBThreadExecutor.instance.diskIO()
+        if (executor != null) {
+            executor.execute {
+                val db = WaypointsDatabase.getInstance(this)
+                if (db != null) {
+                    val savedWaypoints = db.waypointsDao().getAll()
+                    for (waypoint: Waypoint in savedWaypoints) {
+                        waypoints.add(waypoint)
+                        runOnUiThread {
+                            val mapMarker = map.addMarker(MarkerOptions()
+                                    .position(LatLng(waypoint.latitude, waypoint.longitude)))
+                            mapMarker.setDraggable(true)
+                            mapMarker.setZIndex(1000F)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun saveWaypoints() {
+        val executor = DBThreadExecutor.instance.diskIO()
+        if (executor != null) {
+            executor.execute {
+                val db = WaypointsDatabase.getInstance(this)
+                if (db != null) {
+                    db.waypointsDao().deleteAll()
+                    db.waypointsDao().insertAll(waypoints)
+                }
+            }
+        }
     }
 }

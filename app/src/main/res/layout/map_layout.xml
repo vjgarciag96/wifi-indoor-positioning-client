@@ -25,14 +25,14 @@
         android:id="@+id/delete_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="16dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:src="@drawable/ic_delete_black"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/positioning_button"
@@ -41,8 +41,8 @@
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
-        android:backgroundTint="#FFFFFF"
         android:src="@drawable/ic_positioning"
+        app:backgroundTint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

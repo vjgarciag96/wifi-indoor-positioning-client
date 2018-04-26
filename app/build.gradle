@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 27
@@ -41,7 +42,7 @@ dependencies {
 
     //Room
     compile "android.arch.persistence.room:runtime:$arch_version"
-    annotationProcessor "android.arch.persistence.room:compiler:$arch_version"
+    kapt "android.arch.persistence.room:compiler:$arch_version"
 
     testCompile 'junit:junit:4.12'
 

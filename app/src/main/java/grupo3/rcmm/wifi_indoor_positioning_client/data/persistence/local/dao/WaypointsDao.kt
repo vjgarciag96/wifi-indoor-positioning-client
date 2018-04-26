@@ -4,18 +4,23 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy.REPLACE
 import android.arch.persistence.room.Query
-import grupo3.rcmm.wifi_indoor_positioning_client.data.model.AccessPointMeasurement
-import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Fingerprint
+import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Waypoint
 
 /**
  * Created by victor on 25/04/18.
  */
 @Dao
-interface FingerprintingDao {
+interface WaypointsDao {
 
     @Insert(onConflict = REPLACE)
-    fun insert(fingerprinting: AccessPointMeasurement)
+    fun insert(waypoint: Waypoint)
 
-    @Query("SELECT * from fingerprinting")
-    fun getAll(): List<AccessPointMeasurement>
+    @Insert(onConflict = REPLACE)
+    fun insertAll(waypoints: List<Waypoint>)
+
+    @Query("SELECT * from waypoints")
+    fun getAll(): List<Waypoint>
+
+    @Query("DELETE from waypoints")
+    fun deleteAll()
 }
