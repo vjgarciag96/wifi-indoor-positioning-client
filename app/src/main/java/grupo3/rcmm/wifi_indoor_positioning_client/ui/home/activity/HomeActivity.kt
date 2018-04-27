@@ -38,7 +38,7 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.persistence.local.db.Wayp
 import kotlinx.android.synthetic.main.map_layout.*
 
 
-class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
+class HomeActivity : EventBusActivity(), OnMapReadyCallback {
 
     private val TAG: String = "Home Activity"
 
@@ -48,24 +48,18 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var currentScreen: Int = MenuScreens.POSITIONING.ordinal
 
+    private var firstVibrator: Boolean = true
     private lateinit var vibrator: Vibrator
 
     private lateinit var deleteMarkerPosition: LatLng
-
-    private var firstVibrator: Boolean = true
 
     private val waypoints: MutableList<Waypoint> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        initViewListeners()
         initNavigationDrawer()
         loadGoogleMap()
-    }
-
-    private fun initViewListeners() {
-
     }
 
     private fun initNavigationDrawer() {
@@ -109,20 +103,9 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this)
-    }
-
     override fun onStop() {
-        if (EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().unregister(this)
-        saveWaypoints()
         super.onStop()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
+        saveWaypoints()
     }
 
     private fun startListeningWifi() {
