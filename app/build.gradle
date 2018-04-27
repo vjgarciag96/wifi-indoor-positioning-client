@@ -44,6 +44,9 @@ dependencies {
     compile "android.arch.persistence.room:runtime:$arch_version"
     kapt "android.arch.persistence.room:compiler:$arch_version"
 
+    //Dexter
+    compile "com.karumi:dexter:$dexter_version"
+
     testCompile 'junit:junit:4.12'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

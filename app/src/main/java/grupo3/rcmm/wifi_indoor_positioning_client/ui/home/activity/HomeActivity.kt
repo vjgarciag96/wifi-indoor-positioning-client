@@ -30,6 +30,14 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_layout.*
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.model.*
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.karumi.dexter.listener.single.PermissionListener
+import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import grupo3.rcmm.wifi_indoor_positioning_client.common.menu.MenuScreens
 import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.DBThreadExecutor
 import grupo3.rcmm.wifi_indoor_positioning_client.data.model.Waypoint
@@ -165,12 +173,19 @@ class HomeActivity : EventBusActivity(), OnMapReadyCallback {
         }
         map.setOnMarkerClickListener {
             if (currentScreen == MenuScreens.FINGERPRINTING.ordinal) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                    startListeningWifi()
-                else {
-                    val accessCoarseLocationPermission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
-                    ActivityCompat.requestPermissions(this, accessCoarseLocationPermission, REQUEST_PERMISSION_CODE)
-                }
+                Dexter.withActivity(this)
+                        .withPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        .withListener(object : PermissionListener {
+                            override fun onPermissionRationaleShouldBeShown(permission: PermissionRequest?, token: PermissionToken?) {
+                                //This permission doesn't need rationale
+                            }
+                            override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                                Toast.makeText(baseContext, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+                            }
+                            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                                startListeningWifi()
+                            }
+                        }).check()
             }
             true
         }
