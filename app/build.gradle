@@ -42,10 +42,17 @@ dependencies {
 
     //Room
     compile "android.arch.persistence.room:runtime:$arch_version"
+    compile "android.arch.persistence.room:rxjava2:$arch_version"
     kapt "android.arch.persistence.room:compiler:$arch_version"
 
     //Dexter
     compile "com.karumi:dexter:$dexter_version"
+
+    //Lifecycle
+    compile "android.arch.lifecycle:runtime:$arch_version"
+    compile "android.arch.lifecycle:extensions:$arch_version"
+    annotationProcessor "android.arch.lifecycle:compiler:$arch_version"
+    kapt "android.arch.lifecycle:compiler:$arch_version"
 
     testCompile 'junit:junit:4.12'
 
