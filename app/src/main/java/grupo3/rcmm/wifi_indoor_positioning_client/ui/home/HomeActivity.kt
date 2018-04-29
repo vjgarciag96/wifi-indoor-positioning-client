@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Vibrator
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -24,7 +25,9 @@ import kotlinx.android.synthetic.main.map_layout.*
 
 class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
 
-    companion object { private val TAG: String = "Home Activity" }
+    companion object {
+        private val TAG: String = "Home Activity"
+    }
 
     private lateinit var map: GoogleMap
 
@@ -55,44 +58,37 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap) {
         this.map = map
         presenter.onMapReady()
+        Log.d(TAG, "on map ready...")
     }
 
     override fun setMapListeners() {
-        map.setOnMapLongClickListener(presenter::onMapLongClick)
-        map.setOnMarkerClickListener {
-            presenter.onMarkerClick(it)
-            return@setOnMarkerClickListener true
+        if (map != null) {
+            map.setOnMapLongClickListener {
+                Log.d(TAG, "map long click...")
+            }
+            map.setOnMarkerClickListener {
+                presenter.onMarkerClick(it)
+                return@setOnMarkerClickListener true
+            }
+            map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
+                override fun onMarkerDrag(p0: Marker?) =
+                        presenter.onMarkerDrag(map.projection.toScreenLocation(p0!!.position), delete_button)
+
+                override fun onMarkerDragEnd(p0: Marker?) =
+                        presenter.onMarkerDragEnd(map.projection.toScreenLocation(p0!!.position), delete_button,
+                                p0, p0.position)
+
+                override fun onMarkerDragStart(p0: Marker?) = presenter.onMarkerDragStart()
+            })
         }
-        map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
-            override fun onMarkerDrag(p0: Marker?) =
-                    presenter.onMarkerDrag(map.projection.toScreenLocation(p0!!.position), delete_button)
-
-            override fun onMarkerDragEnd(p0: Marker?) =
-                    presenter.onMarkerDragEnd(map.projection.toScreenLocation(p0!!.position), delete_button,
-                            p0, p0.position)
-
-            override fun onMarkerDragStart(p0: Marker?) = presenter.onMarkerDragStart()
-
-        })
     }
 
-    override fun showPositioning() {
-        setTitle(getString(R.string.positioning))
-        positioning_button.visibility = View.VISIBLE
-    }
-
-    private fun hidePositioningView() {
-        positioning_button.visibility = View.INVISIBLE
-    }
-
-    override fun showWaypoints() {
-        hidePositioningView()
-        setTitle(getString(R.string.waypoints))
-    }
-
-    override fun showFingerprinting() {
-        hidePositioningView()
-        setTitle(getString(R.string.fingerprinting))
+    override fun removeMapListeners() {
+        if (map != null) {
+            map.setOnMapLongClickListener(null)
+            map.setOnMarkerClickListener(null)
+            map.setOnMarkerDragListener(null)
+        }
     }
 
     override fun drawFloorPlan() {
@@ -109,13 +105,16 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
     }
 
     override fun drawWaypoints(waypoints: List<Waypoint>) {
-        for (waypoint: Waypoint in waypoints) {
-            val mapMarker = map.addMarker(MarkerOptions()
-                    .title(waypoint.id.toString())
-                    .position(LatLng(waypoint.latitude,
-                            waypoint.longitude)))
-            mapMarker.isDraggable = true
-        }
+        for (waypoint: Waypoint in waypoints)
+            addMarker(waypoint.id.toString(), LatLng(waypoint.latitude,
+                    waypoint.longitude))
+    }
+
+    override fun createViewListeners() {
+        add_marker_button.setOnClickListener(View.OnClickListener {
+            if (map != null)
+                presenter.onAddWaypointButtonClick(map.cameraPosition.target)
+        })
     }
 
     override fun loadNavigationDrawer() {
@@ -140,18 +139,13 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
     }
 
     override fun addMarker(title: String, position: LatLng) {
-        val mapMarker = map.addMarker(MarkerOptions()
+        map.addMarker(MarkerOptions()
                 .position(position)
+                .draggable(true)
                 .title(title))
-        mapMarker.isDraggable = true
-        mapMarker.zIndex = 1000F
     }
 
     override fun deleteMarker(marker: Marker) = marker.remove()
-
-    override fun updateMarkerPosition(marker: Marker, newPosition: LatLng) {
-        marker.position = newPosition
-    }
 
     override fun showToast(message: Int) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -176,5 +170,25 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
 
     override fun showDeleteButton() {
         delete_button.setVisibility(View.VISIBLE)
+    }
+
+    override fun setViewTitle(title: String) {
+        setTitle(title)
+    }
+
+    override fun hideAddMarkerButton() {
+        add_marker_button.visibility = View.INVISIBLE
+    }
+
+    override fun showAddMarkerButton() {
+        add_marker_button.visibility = View.VISIBLE
+    }
+
+    override fun hidePositioningButton() {
+        positioning_button.visibility = View.INVISIBLE
+    }
+
+    override fun showPositioningButton() {
+        positioning_button.visibility = View.VISIBLE
     }
 }

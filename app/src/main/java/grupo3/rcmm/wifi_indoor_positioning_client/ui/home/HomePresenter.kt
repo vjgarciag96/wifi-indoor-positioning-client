@@ -39,15 +39,30 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
         super.onAttach(view)
         getView().loadNavigationDrawer()
         getView().loadActionBar()
+        getView().createViewListeners()
         getView().loadGoogleMap()
     }
 
     fun onNavigationItemSelected(itemId: Int) {
         menuId = itemId
         when (itemId) {
-            R.id.positioning -> getView().showPositioning()
-            R.id.waypoints -> getView().showWaypoints()
-            R.id.fingerprinting -> getView().showFingerprinting()
+            R.id.positioning -> {
+                getView().removeMapListeners()
+                getView().hideAddMarkerButton()
+                getView().setViewTitle(getContext().getString(R.string.positioning))
+                getView().showPositioningButton()
+            }
+            R.id.waypoints -> {
+                getView().setMapListeners()
+                getView().hidePositioningButton()
+                getView().setViewTitle(getContext().getString(R.string.waypoints))
+                getView().showAddMarkerButton()
+            }
+            R.id.fingerprinting -> {
+                getView().hidePositioningButton()
+                getView().hideAddMarkerButton()
+                getView().setViewTitle(getContext().getString(R.string.fingerprinting))
+            }
         }
         getView().closeDrawerLayout()
     }
@@ -59,23 +74,23 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
     }
 
     fun onMapReady() {
-        getView().setMapListeners()
+        getView().removeMapListeners()
         getView().drawFloorPlan()
-        (getDataManager() as HomeDataManager).getWaypoints()
-                .observe(getView() as LifecycleOwner, Observer {
-                    Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
-                    getView().drawWaypoints(it!!)
-                })
+        val getWaypointsObservable = (getDataManager() as HomeDataManager).getWaypoints()
+        getWaypointsObservable.observe(getView() as LifecycleOwner, Observer {
+            Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
+            getView().drawWaypoints(it!!)
+            //remove observers to avoid duplicate markers
+            getWaypointsObservable.removeObservers(getView() as LifecycleOwner)
+        })
     }
 
-    fun onMapLongClick(position: LatLng) {
-        if (menuId == R.id.waypoints)
-            (getDataManager() as HomeDataManager)
-                    .addWaypoint(Waypoint(position.latitude, position.longitude))
-                    .observe(getView() as LifecycleOwner, Observer {
-                        getView().addMarker(it.toString(), position)
-                    })
-
+    fun onAddWaypointButtonClick(position: LatLng) {
+        (getDataManager() as HomeDataManager)
+                .addWaypoint(Waypoint(position.latitude, position.longitude))
+                .observe(getView() as LifecycleOwner, Observer {
+                    getView().addMarker(it.toString(), position)
+                })
     }
 
     fun onMarkerClick(marker: Marker) {
