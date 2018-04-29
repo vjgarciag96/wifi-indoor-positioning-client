@@ -200,4 +200,12 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
         if (map != null)
             map.clear()
     }
+
+    override fun disableMapCompass() {
+        map.uiSettings.isCompassEnabled = false
+    }
+
+    override fun disableMapToolbar() {
+        map.uiSettings.isMapToolbarEnabled = false
+    }
 }

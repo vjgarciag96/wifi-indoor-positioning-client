@@ -32,4 +32,6 @@ interface HomeView : BaseView {
     fun hidePositioningButton()
     fun showPositioningButton()
     fun removeAllMarkers()
+    fun disableMapToolbar()
+    fun disableMapCompass()
 }

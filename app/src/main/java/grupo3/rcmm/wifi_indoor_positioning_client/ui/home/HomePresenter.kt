@@ -91,6 +91,8 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
     }
 
     fun onMapReady() {
+        getView().disableMapCompass()
+        getView().disableMapToolbar()
         getView().removeMapListeners()
         getView().drawFloorPlan()
     }
