@@ -140,6 +140,8 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
 
     override fun addMarker(title: String, position: LatLng) {
         map.addMarker(MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
+                .anchor(0.5F, 0.5F)
                 .position(position)
                 .draggable(true)
                 .title(title))
