@@ -193,4 +193,9 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
     override fun showPositioningButton() {
         positioning_button.visibility = View.VISIBLE
     }
+
+    override fun removeAllMarkers() {
+        if (map != null)
+            map.clear()
+    }
 }

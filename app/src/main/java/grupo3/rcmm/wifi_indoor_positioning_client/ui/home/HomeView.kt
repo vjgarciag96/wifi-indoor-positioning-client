@@ -31,5 +31,5 @@ interface HomeView : BaseView {
     fun showAddMarkerButton()
     fun hidePositioningButton()
     fun showPositioningButton()
-
+    fun removeAllMarkers()
 }

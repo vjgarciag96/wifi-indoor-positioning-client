@@ -45,6 +45,8 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
 
     fun onNavigationItemSelected(itemId: Int) {
         menuId = itemId
+        getView().removeAllMarkers()
+        getView().drawFloorPlan()
         when (itemId) {
             R.id.positioning -> {
                 getView().removeMapListeners()
@@ -53,12 +55,27 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 getView().showPositioningButton()
             }
             R.id.waypoints -> {
+                val getWaypointsObservable = (getDataManager() as HomeDataManager).getWaypoints()
+                getWaypointsObservable.observe(getView() as LifecycleOwner, Observer {
+                    Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
+                    getView().drawWaypoints(it!!)
+                    //remove observers to avoid duplicate markers
+                    getWaypointsObservable.removeObservers(getView() as LifecycleOwner)
+                })
                 getView().setMapListeners()
                 getView().hidePositioningButton()
                 getView().setViewTitle(getContext().getString(R.string.waypoints))
                 getView().showAddMarkerButton()
             }
             R.id.fingerprinting -> {
+                val getWaypointsObservable = (getDataManager() as HomeDataManager).getWaypoints()
+                getWaypointsObservable.observe(getView() as LifecycleOwner, Observer {
+                    Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
+                    getView().drawWaypoints(it!!)
+                    //remove observers to avoid duplicate markers
+                    getWaypointsObservable.removeObservers(getView() as LifecycleOwner)
+                })
+                getView().removeMapListeners()
                 getView().hidePositioningButton()
                 getView().hideAddMarkerButton()
                 getView().setViewTitle(getContext().getString(R.string.fingerprinting))
@@ -76,13 +93,6 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
     fun onMapReady() {
         getView().removeMapListeners()
         getView().drawFloorPlan()
-        val getWaypointsObservable = (getDataManager() as HomeDataManager).getWaypoints()
-        getWaypointsObservable.observe(getView() as LifecycleOwner, Observer {
-            Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
-            getView().drawWaypoints(it!!)
-            //remove observers to avoid duplicate markers
-            getWaypointsObservable.removeObservers(getView() as LifecycleOwner)
-        })
     }
 
     fun onAddWaypointButtonClick(position: LatLng) {
