@@ -58,7 +58,7 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 val getWaypointsObservable = (getDataManager() as HomeDataManager).getWaypoints()
                 getWaypointsObservable.observe(getView() as LifecycleOwner, Observer {
                     Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
-                    getView().drawWaypoints(it!!)
+                    getView().drawWaypoints(it!!, true)
                     //remove observers to avoid duplicate markers
                     getWaypointsObservable.removeObservers(getView() as LifecycleOwner)
                 })
@@ -71,7 +71,7 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 val getWaypointsObservable = (getDataManager() as HomeDataManager).getWaypoints()
                 getWaypointsObservable.observe(getView() as LifecycleOwner, Observer {
                     Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
-                    getView().drawWaypoints(it!!)
+                    getView().drawWaypoints(it!!, false)
                     //remove observers to avoid duplicate markers
                     getWaypointsObservable.removeObservers(getView() as LifecycleOwner)
                 })
@@ -99,7 +99,7 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
         (getDataManager() as HomeDataManager)
                 .addWaypoint(Waypoint(position.latitude, position.longitude))
                 .observe(getView() as LifecycleOwner, Observer {
-                    getView().addMarker(it.toString(), position)
+                    getView().addMarker(it.toString(), position, true)
                 })
     }
 

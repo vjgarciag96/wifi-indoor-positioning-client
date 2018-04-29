@@ -104,10 +104,10 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.47896890365607, -6.34215496480465), 19f))
     }
 
-    override fun drawWaypoints(waypoints: List<Waypoint>) {
+    override fun drawWaypoints(waypoints: List<Waypoint>, draggable: Boolean) {
         for (waypoint: Waypoint in waypoints)
             addMarker(waypoint.id.toString(), LatLng(waypoint.latitude,
-                    waypoint.longitude))
+                    waypoint.longitude), draggable)
     }
 
     override fun createViewListeners() {
@@ -138,12 +138,14 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
         home_drawer_layout.closeDrawers()
     }
 
-    override fun addMarker(title: String, position: LatLng) {
+    override fun addMarker(title: String,
+                           position: LatLng,
+                           draggable: Boolean) {
         map.addMarker(MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
                 .anchor(0.5F, 0.5F)
                 .position(position)
-                .draggable(true)
+                .draggable(draggable)
                 .title(title))
     }
 
