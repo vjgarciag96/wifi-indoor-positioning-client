@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_layout.*
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.model.*
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.HomeDataManager
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.HomeRepository
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 import kotlinx.android.synthetic.main.map_layout.*
 
@@ -39,7 +39,7 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        presenter = HomePresenter(HomeDataManager(this))
+        presenter = HomePresenter(HomeRepository(this))
         presenter.onAttach(this)
     }
 
@@ -61,34 +61,32 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
         Log.d(TAG, "on map ready...")
     }
 
-    override fun setMapListeners() {
-        if (map != null) {
-            map.setOnMapLongClickListener {
-                Log.d(TAG, "map long click...")
-            }
-            map.setOnMarkerClickListener {
-                presenter.onMarkerClick(it)
-                return@setOnMarkerClickListener true
-            }
-            map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
-                override fun onMarkerDrag(p0: Marker?) =
-                        presenter.onMarkerDrag(map.projection.toScreenLocation(p0!!.position), delete_button)
-
-                override fun onMarkerDragEnd(p0: Marker?) =
-                        presenter.onMarkerDragEnd(map.projection.toScreenLocation(p0!!.position), delete_button,
-                                p0, p0.position)
-
-                override fun onMarkerDragStart(p0: Marker?) = presenter.onMarkerDragStart()
-            })
+    override fun setMarkerClickListener() {
+        map.setOnMarkerClickListener {
+            presenter.onMarkerClick(it)
+            return@setOnMarkerClickListener true
         }
     }
 
-    override fun removeMapListeners() {
-        if (map != null) {
-            map.setOnMapLongClickListener(null)
-            map.setOnMarkerClickListener(null)
-            map.setOnMarkerDragListener(null)
-        }
+    override fun removeMarkerClickListener() {
+        map.setOnMarkerClickListener(null)
+    }
+
+    override fun removeMarkerDragListener() {
+        map.setOnMarkerDragListener(null)
+    }
+
+    override fun setMarkerDragListener() {
+        map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
+            override fun onMarkerDrag(p0: Marker?) =
+                    presenter.onMarkerDrag(map.projection.toScreenLocation(p0!!.position), delete_button)
+
+            override fun onMarkerDragEnd(p0: Marker?) =
+                    presenter.onMarkerDragEnd(map.projection.toScreenLocation(p0!!.position), delete_button,
+                            p0, p0.position)
+
+            override fun onMarkerDragStart(p0: Marker?) = presenter.onMarkerDragStart()
+        })
     }
 
     override fun drawFloorPlan() {

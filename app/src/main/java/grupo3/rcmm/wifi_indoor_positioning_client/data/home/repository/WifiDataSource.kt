@@ -14,7 +14,7 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.AccessPointMea
  */
 class WifiDataSource : DataSource {
 
-    private lateinit var wifiManager: WifiManager
+    private var wifiManager: WifiManager
 
     constructor(context: Context) {
         wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager

@@ -17,7 +17,8 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import grupo3.rcmm.wifi_indoor_positioning_client.R
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataManager
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.HomeDataManager
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.HomeRepository
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 import grupo3.rcmm.wifi_indoor_positioning_client.ui.base.BasePresenter
 import grupo3.rcmm.wifi_indoor_positioning_client.ui.base.IPresenter
@@ -49,33 +50,36 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
         getView().drawFloorPlan()
         when (itemId) {
             R.id.positioning -> {
-                getView().removeMapListeners()
+                getView().removeMarkerClickListener()
+                getView().removeMarkerDragListener()
                 getView().hideAddMarkerButton()
                 getView().setViewTitle(getContext().getString(R.string.positioning))
                 getView().showPositioningButton()
             }
             R.id.waypoints -> {
-                val getWaypointsObservable = (getDataManager() as HomeDataManager).getWaypoints()
+                val getWaypointsObservable = (getDataManager() as HomeRepository).getWaypoints()
                 getWaypointsObservable.observe(getView() as LifecycleOwner, Observer {
                     Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
                     getView().drawWaypoints(it!!, true)
                     //remove observers to avoid duplicate markers
                     getWaypointsObservable.removeObservers(getView() as LifecycleOwner)
                 })
-                getView().setMapListeners()
+                getView().removeMarkerClickListener()
+                getView().setMarkerDragListener()
                 getView().hidePositioningButton()
                 getView().setViewTitle(getContext().getString(R.string.waypoints))
                 getView().showAddMarkerButton()
             }
             R.id.fingerprinting -> {
-                val getWaypointsObservable = (getDataManager() as HomeDataManager).getWaypoints()
+                val getWaypointsObservable = (getDataManager() as HomeRepository).getWaypoints()
                 getWaypointsObservable.observe(getView() as LifecycleOwner, Observer {
                     Log.d(TAG, "fetching " + it?.size.toString() + " waypoints")
                     getView().drawWaypoints(it!!, false)
                     //remove observers to avoid duplicate markers
                     getWaypointsObservable.removeObservers(getView() as LifecycleOwner)
                 })
-                getView().removeMapListeners()
+                getView().removeMarkerDragListener()
+                getView().setMarkerClickListener()
                 getView().hidePositioningButton()
                 getView().hideAddMarkerButton()
                 getView().setViewTitle(getContext().getString(R.string.fingerprinting))
@@ -93,12 +97,11 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
     fun onMapReady() {
         getView().disableMapCompass()
         getView().disableMapToolbar()
-        getView().removeMapListeners()
         getView().drawFloorPlan()
     }
 
     fun onAddWaypointButtonClick(position: LatLng) {
-        (getDataManager() as HomeDataManager)
+        (getDataManager() as HomeRepository)
                 .addWaypoint(Waypoint(position.latitude, position.longitude))
                 .observe(getView() as LifecycleOwner, Observer {
                     getView().addMarker(it.toString(), position, true)
@@ -118,12 +121,16 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                                 getView().showToast(R.string.permission_denied)
 
                         override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                            (getDataManager() as HomeDataManager)
+                            (getDataManager() as HomeRepository)
                                     .getAccessPointMeasurements()
                                     .observe(getView() as LifecycleOwner,
                                             Observer {
                                                 Log.d(TAG, "scanned " + it?.size + " access points...")
-                                                //TODO send data to api
+                                                for (measurement in it!!)
+                                                    (getDataManager() as HomeRepository)
+                                                            .addFingerprint(Fingerprint(marker.position.latitude,
+                                                                    marker.position.longitude, measurement.rssi,
+                                                                    measurement.mac))
                                             })
                         }
                     }).check()
@@ -145,9 +152,9 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
             getView().deactivateDeleteButton()
             if (overlaps(projectedPosition, deleteButton)) {
                 getView().deleteMarker(marker)
-                (getDataManager() as HomeDataManager).deleteWaypoint(marker.title.toLong())
+                (getDataManager() as HomeRepository).deleteWaypoint(marker.title.toLong())
             } else
-                (getDataManager() as HomeDataManager).updateWaypoint(Waypoint(marker.title.toLong(),
+                (getDataManager() as HomeRepository).updateWaypoint(Waypoint(marker.title.toLong(),
                         marker.position.latitude, marker.position.longitude))
         }
     }

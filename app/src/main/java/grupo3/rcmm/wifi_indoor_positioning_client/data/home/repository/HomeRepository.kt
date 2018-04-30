@@ -9,25 +9,27 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataSource
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.AccessPointMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.local.db.WaypointsDatabase
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
 
 /**
  * Created by victor on 28/04/18.
  */
-class HomeDataManager(private val context: Context) : DataManager {
+class HomeRepository(private val context: Context) : DataManager, HomeDataSource {
 
     private var wifiDataSource: DataSource = WifiDataSource(context)
+    private var fingerprintingDataSource: DataSource = FingerprintingMockDataSource()
 
-    fun getAccessPointMeasurements(): LiveData<List<AccessPointMeasurement>> =
+    override fun getAccessPointMeasurements(): LiveData<List<AccessPointMeasurement>> =
             (wifiDataSource as WifiDataSource).getAccessPointMeasurements()
 
-    fun getWaypoints(): LiveData<List<Waypoint>> {
+    override fun getWaypoints(): LiveData<List<Waypoint>> {
         return WaypointsDatabase
                 .getInstance(context)
                 ?.waypointsDao()
                 ?.getAll()!!
     }
 
-    fun addWaypoint(waypoint: Waypoint): LiveData<Long> {
+    override fun addWaypoint(waypoint: Waypoint): LiveData<Long> {
         var waypointLiveData = MutableLiveData<Long>()
         AppThreadExecutor.instance.diskIO()?.execute {
             val newId = WaypointsDatabase.getInstance(context)
@@ -40,7 +42,7 @@ class HomeDataManager(private val context: Context) : DataManager {
         return waypointLiveData
     }
 
-    fun deleteWaypoint(id: Long) {
+    override fun deleteWaypoint(id: Long) {
         AppThreadExecutor.instance.diskIO()?.execute {
             WaypointsDatabase.getInstance(context)
                     ?.waypointsDao()
@@ -48,11 +50,15 @@ class HomeDataManager(private val context: Context) : DataManager {
         }
     }
 
-    fun updateWaypoint(waypoint: Waypoint) {
+    override fun updateWaypoint(waypoint: Waypoint) {
         AppThreadExecutor.instance.diskIO()?.execute {
             WaypointsDatabase.getInstance(context)
                     ?.waypointsDao()
                     ?.update(waypoint)
         }
+    }
+
+    override fun addFingerprint(fingerprint: Fingerprint) {
+        (fingerprintingDataSource as FingerprintingDataSource).sendFingerprint(fingerprint)
     }
 }
