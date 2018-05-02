@@ -55,6 +55,7 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 getView().hideAddMarkerButton()
                 getView().setViewTitle(getContext().getString(R.string.positioning))
                 getView().showPositioningButton()
+                (getDataManager() as HomeRepository).getBeaconMeasurements()
             }
             R.id.waypoints -> {
                 val getWaypointsObservable = (getDataManager() as HomeRepository).getWaypoints()

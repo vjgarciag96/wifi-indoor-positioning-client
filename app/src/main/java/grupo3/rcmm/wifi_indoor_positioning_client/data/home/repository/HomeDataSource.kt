@@ -19,4 +19,6 @@ interface HomeDataSource : DataSource {
     fun updateWaypoint(waypoint: Waypoint)
 
     fun addFingerprint(fingerprint: Fingerprint)
+
+    fun getBeaconMeasurements()
 }
