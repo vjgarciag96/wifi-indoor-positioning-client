@@ -6,6 +6,7 @@ import android.os.IBinder
 import android.util.Log
 import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.trilateration.NonLinearLeastSquaresSolver
 import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.trilateration.TrilaterationFunction
+import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.trilateration.filter.SimpleKalman
 import org.altbeacon.beacon.*
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer
 
@@ -26,6 +27,7 @@ class BeaconScanService : Service(), BeaconConsumer {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        BeaconManager.setRssiFilterImplClass(SimpleKalman::class.java)
         beaconManager = BeaconManager.getInstanceForApplication(this)
         beaconManager.beaconParsers.add(BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"))
         beaconManager.beaconParsers.add(BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"))
