@@ -54,6 +54,9 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:$arch_version"
     kapt "android.arch.lifecycle:compiler:$arch_version"
 
+    //Android Beacon Library
+    compile "org.altbeacon:android-beacon-library:$android_beacon_library_version"
+
     testCompile 'junit:junit:4.12'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
