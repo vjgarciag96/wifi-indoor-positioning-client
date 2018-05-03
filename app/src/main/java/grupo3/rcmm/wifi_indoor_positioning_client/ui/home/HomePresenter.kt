@@ -20,6 +20,8 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataManager
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.HomeRepository
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.LaterationDataSource
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.service.BeaconScanService
 import grupo3.rcmm.wifi_indoor_positioning_client.ui.base.BasePresenter
 import grupo3.rcmm.wifi_indoor_positioning_client.ui.base.IPresenter
 
@@ -56,6 +58,11 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 getView().setViewTitle(getContext().getString(R.string.positioning))
                 getView().showPositioningButton()
                 (getDataManager() as HomeRepository).getBeaconMeasurements()
+                LaterationDataSource.getInstance(getContext()).getPosition().observe(
+                        getView() as LifecycleOwner, Observer {
+                    getView().addMarker("User", it!!, false)
+                }
+                )
             }
             R.id.waypoints -> {
                 val getWaypointsObservable = (getDataManager() as HomeRepository).getWaypoints()
@@ -127,11 +134,12 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                                     .observe(getView() as LifecycleOwner,
                                             Observer {
                                                 Log.d(TAG, "scanned " + it?.size + " access points...")
-                                                for (measurement in it!!)
+                                                for (measurement in it!!) {
                                                     (getDataManager() as HomeRepository)
                                                             .addFingerprint(Fingerprint(marker.position.latitude,
                                                                     marker.position.longitude, measurement.rssi,
                                                                     measurement.mac))
+                                                }
                                             })
                         }
                     }).check()

@@ -36,7 +36,6 @@ class SimpleKalman : RssiFilter {
     }
 
     override fun calculateRssi(): Double {
-
         val kalmanGain = priorErrorCovarianceRSSI / (priorErrorCovarianceRSSI + measurementNoise)
 
         estimatedRSSI = priorRSSI + kalmanGain * (lastRSSI - priorRSSI)
