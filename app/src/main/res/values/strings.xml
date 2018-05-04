@@ -4,4 +4,6 @@
     <string name="waypoints">Waypoints</string>
     <string name="fingerprinting">Fingerprinting</string>
     <string name="permission_denied">Debes conceder los permisos de ubicación para escanear los puntos de acceso</string>
+    <string name="fingerprint_success">Fingerprinting registrado con éxito</string>
+    <string name="fingerprint_error">Error registrando el fingerprint</string>
 </resources>

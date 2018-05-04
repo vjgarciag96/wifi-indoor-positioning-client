@@ -54,11 +54,19 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:$arch_version"
     kapt "android.arch.lifecycle:compiler:$arch_version"
 
+    //Android Beacon Library
+    compile "org.altbeacon:android-beacon-library:$android_beacon_library_version"
+
+    //Apache Math3
+    compile 'org.apache.commons:commons-math3:3.6.1'
+
+    //Gson
+    compile 'com.google.code.gson:gson:2.8.4'
+
     testCompile 'junit:junit:4.12'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     compile 'com.squareup.retrofit2:retrofit:2.4.0'
-    compile "com.squareup.retrofit2:adapter-rxjava2:2.4.0"
     compile "com.squareup.retrofit2:converter-gson:2.4.0"
 
 }

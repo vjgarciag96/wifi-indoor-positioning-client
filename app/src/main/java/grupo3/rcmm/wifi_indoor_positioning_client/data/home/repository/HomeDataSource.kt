@@ -18,5 +18,5 @@ interface HomeDataSource : DataSource {
     fun deleteWaypoint(id: Long)
     fun updateWaypoint(waypoint: Waypoint)
 
-    fun addFingerprint(fingerprint: Fingerprint)
+    fun addFingerprint(fingerprint: Fingerprint): LiveData<Boolean>
 }

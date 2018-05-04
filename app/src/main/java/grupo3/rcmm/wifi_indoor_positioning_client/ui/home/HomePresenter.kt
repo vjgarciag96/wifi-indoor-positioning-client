@@ -98,6 +98,8 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
         getView().disableMapCompass()
         getView().disableMapToolbar()
         getView().drawFloorPlan()
+        //getView().moveMapCameraTo(LatLng(39.47896890365607, -6.34215496480465))
+        getView().moveMapCameraTo(LatLng(39.469202, -6.381126))
     }
 
     fun onAddWaypointButtonClick(position: LatLng) {
@@ -118,7 +120,7 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                         }
 
                         override fun onPermissionDenied(response: PermissionDeniedResponse?) =
-                                getView().showToast(R.string.permission_denied)
+                                getView().showToast(getContext().getString(R.string.permission_denied))
 
                         override fun onPermissionGranted(response: PermissionGrantedResponse?) {
                             (getDataManager() as HomeRepository)
@@ -131,6 +133,12 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                                                             .addFingerprint(Fingerprint(marker.position.latitude,
                                                                     marker.position.longitude, measurement.rssi,
                                                                     measurement.mac))
+                                                            .observe(getView() as LifecycleOwner, Observer {
+                                                                when (it) {
+                                                                    true -> getView().showToast(getContext().getString(R.string.fingerprint_success))
+                                                                    false -> getView().showToast(getContext().getString(R.string.fingerprint_error))
+                                                                }
+                                                            })
                                             })
                         }
                     }).check()

@@ -7,18 +7,19 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
-    private static final String BASE_URL = "https://direccion_api/"; //TODO
 
-    private static APIInterface service;
+    private static final String BASE_URL = "http://192.168.1.130:6969/";
 
-    public static APIInterface getClient() {
+    private static FingerprintingService service;
+
+    public static FingerprintingService getClient() {
         if (service == null) {
             Gson gson = new GsonBuilder().create();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
-            service = retrofit.create(APIInterface.class);
+            service = retrofit.create(FingerprintingService.class);
         }
         return service;
     }

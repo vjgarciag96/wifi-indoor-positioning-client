@@ -17,7 +17,7 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
 class HomeRepository(private val context: Context) : DataManager, HomeDataSource {
 
     private var wifiDataSource: DataSource = WifiDataSource(context)
-    private var fingerprintingDataSource: DataSource = FingerprintingMockDataSource()
+    private var fingerprintingDataSource: DataSource = FingerprintAPI()
 
     override fun getAccessPointMeasurements(): LiveData<List<AccessPointMeasurement>> =
             (wifiDataSource as WifiDataSource).getAccessPointMeasurements()
@@ -58,7 +58,7 @@ class HomeRepository(private val context: Context) : DataManager, HomeDataSource
         }
     }
 
-    override fun addFingerprint(fingerprint: Fingerprint) {
-        (fingerprintingDataSource as FingerprintingDataSource).sendFingerprint(fingerprint)
+    override fun addFingerprint(fingerprint: Fingerprint): LiveData<Boolean> {
+        return (fingerprintingDataSource as FingerprintingDataSource).sendFingerprint(fingerprint)
     }
 }

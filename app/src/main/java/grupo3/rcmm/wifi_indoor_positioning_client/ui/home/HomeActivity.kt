@@ -98,8 +98,10 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
                 .position(LatLng(39.47896890365607, -6.34215496480465),
                         32.68545310545363f,
                         83.33159181033633f))
+    }
 
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(39.47896890365607, -6.34215496480465), 19f))
+    override fun moveMapCameraTo(location: LatLng) {
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 19f))
     }
 
     override fun drawWaypoints(waypoints: List<Waypoint>, draggable: Boolean) {
@@ -149,7 +151,7 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
 
     override fun deleteMarker(marker: Marker) = marker.remove()
 
-    override fun showToast(message: Int) {
+    override fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
