@@ -18,6 +18,7 @@ import com.karumi.dexter.listener.single.PermissionListener
 import grupo3.rcmm.wifi_indoor_positioning_client.R
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataManager
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.HomeRepository
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 import grupo3.rcmm.wifi_indoor_positioning_client.ui.base.BasePresenter
@@ -55,6 +56,17 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 getView().hideAddMarkerButton()
                 getView().setViewTitle(getContext().getString(R.string.positioning))
                 getView().showPositioningButton()
+                val repository = getDataManager() as HomeRepository
+                val lifecycleOwner = getView() as LifecycleOwner
+                repository.getAccessPointMeasurements()
+                        .observe(lifecycleOwner,
+                                Observer {
+                                    repository.getPosition(it!!)
+                                            .observe(lifecycleOwner,
+                                                    Observer {
+                                                        getView().addMarker("User", it!!, false)
+                                                    })
+                                })
             }
             R.id.waypoints -> {
                 val getWaypointsObservable = (getDataManager() as HomeRepository).getWaypoints()
@@ -128,17 +140,20 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                                     .observe(getView() as LifecycleOwner,
                                             Observer {
                                                 Log.d(TAG, "scanned " + it?.size + " access points...")
+                                                val fingerprinting: MutableList<Fingerprint> = mutableListOf()
+                                                val timestamp = System.currentTimeMillis()
                                                 for (measurement in it!!)
-                                                    (getDataManager() as HomeRepository)
-                                                            .addFingerprint(Fingerprint(marker.position.latitude,
-                                                                    marker.position.longitude, measurement.rssi,
-                                                                    measurement.mac))
-                                                            .observe(getView() as LifecycleOwner, Observer {
-                                                                when (it) {
-                                                                    true -> getView().showToast(getContext().getString(R.string.fingerprint_success))
-                                                                    false -> getView().showToast(getContext().getString(R.string.fingerprint_error))
-                                                                }
-                                                            })
+                                                    fingerprinting.add(Fingerprint(marker.position.latitude,
+                                                            marker.position.longitude, measurement.rssi,
+                                                            measurement.mac, timestamp))
+                                                (getDataManager() as HomeRepository)
+                                                        .addFingerprint(Fingerprinting(fingerprinting))
+                                                        .observe(getView() as LifecycleOwner, Observer {
+                                                            when (it) {
+                                                                true -> getView().showToast(getContext().getString(R.string.fingerprint_success))
+                                                                false -> getView().showToast(getContext().getString(R.string.fingerprint_error))
+                                                            }
+                                                        })
                                             })
                         }
                     }).check()

@@ -3,6 +3,7 @@ package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
+import com.google.android.gms.maps.model.LatLng
 import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.AppThreadExecutor
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataManager
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataSource
@@ -10,6 +11,9 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.AccessPointMea
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.local.db.WaypointsDatabase
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.MLMeasurement
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.RssiMeasurement
 
 /**
  * Created by victor on 28/04/18.
@@ -18,6 +22,7 @@ class HomeRepository(private val context: Context) : DataManager, HomeDataSource
 
     private var wifiDataSource: DataSource = WifiDataSource(context)
     private var fingerprintingDataSource: DataSource = FingerprintAPI()
+    private var locationPredictionDataSource: DataSource = LocationPredictionWEKA(context)
 
     override fun getAccessPointMeasurements(): LiveData<List<AccessPointMeasurement>> =
             (wifiDataSource as WifiDataSource).getAccessPointMeasurements()
@@ -58,7 +63,15 @@ class HomeRepository(private val context: Context) : DataManager, HomeDataSource
         }
     }
 
-    override fun addFingerprint(fingerprint: Fingerprint): LiveData<Boolean> {
+    override fun addFingerprint(fingerprint: Fingerprinting): LiveData<Boolean> {
         return (fingerprintingDataSource as FingerprintingDataSource).sendFingerprint(fingerprint)
+    }
+
+    override fun getPosition(measurements: List<AccessPointMeasurement>): LiveData<LatLng> {
+        val measurementsMap: MutableMap<String, MLMeasurement<Double>> = mutableMapOf()
+        for (measurement in measurements)
+            measurementsMap.put(measurement.mac, RssiMeasurement(measurement.rssi.toDouble()))
+        return (locationPredictionDataSource as LocationPredictionWEKA)
+                .getLocationPrediction(measurementsMap)
     }
 }

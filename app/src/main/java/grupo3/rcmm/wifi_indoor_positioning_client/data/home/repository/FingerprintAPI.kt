@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.remote.APIClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,11 +19,12 @@ class FingerprintAPI : FingerprintingDataSource {
         private val TAG = "FingerprintAPI"
     }
 
-    override fun sendFingerprint(fingerprint: Fingerprint): LiveData<Boolean> {
+    override fun sendFingerprint(fingerprint: Fingerprinting): LiveData<Boolean> {
         val resultLiveData: MutableLiveData<Boolean> = MutableLiveData()
         APIClient.getClient().postFingerprint(fingerprint).enqueue(object : Callback<Void> {
             override fun onFailure(call: Call<Void>?, t: Throwable?) {
-                Log.d(TAG, t!!.message)
+                if (t?.message != null)
+                    Log.d(TAG, t.message)
                 resultLiveData.postValue(false)
             }
 

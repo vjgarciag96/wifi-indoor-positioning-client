@@ -14,19 +14,19 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.AccessPointMea
  */
 class WifiDataSource : DataSource {
 
-    private var wifiManager: WifiManager
+    private var context: Context
 
     constructor(context: Context) {
-        wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        this.context = context
     }
 
     fun getAccessPointMeasurements(): LiveData<List<AccessPointMeasurement>> {
+        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        wifiManager.startScan()
         val accessPointMeasurementsLiveData = MutableLiveData<List<AccessPointMeasurement>>()
         AppThreadExecutor.instance.diskIO()?.execute {
             val scanResults = AccessPointMeasurementsMapper().mapList(wifiManager.scanResults)
-            AppThreadExecutor.instance.mainThread()?.execute {
-                accessPointMeasurementsLiveData.value = scanResults
-            }
+            accessPointMeasurementsLiveData.postValue(scanResults)
         }
         return accessPointMeasurementsLiveData
     }

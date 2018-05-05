@@ -21,55 +21,62 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+kapt {
+    correctErrorTypes = true
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:27.+'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile "com.android.support:design:$android_libraries_version"
 
-    //Event Bus
-    compile "org.greenrobot:eventbus:$eventbus_version"
+    //Android
+    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "com.android.support:design:$android_libraries_version"
+
 
     //Google Maps API
-    compile "com.google.android.gms:play-services-maps:$play_services_version"
-    compile "com.google.android.gms:play-services:$play_services_version"
-    compile "com.google.android.gms:play-services-location:$play_services_version"
+    implementation "com.google.android.gms:play-services-maps:$play_services_version"
+    implementation "com.google.android.gms:play-services-base:$play_services_version"
+    implementation "com.google.android.gms:play-services-location:$play_services_version"
 
     //Room
-    compile "android.arch.persistence.room:runtime:$arch_version"
-    compile "android.arch.persistence.room:rxjava2:$arch_version"
-    kapt "android.arch.persistence.room:compiler:$arch_version"
+    implementation "android.arch.persistence.room:runtime:1.0.0"
+    kapt "android.arch.persistence.room:compiler:1.0.0"
+
 
     //Dexter
-    compile "com.karumi:dexter:$dexter_version"
+    implementation "com.karumi:dexter:$dexter_version"
 
     //Lifecycle
-    compile "android.arch.lifecycle:runtime:$arch_version"
-    compile "android.arch.lifecycle:extensions:$arch_version"
-    annotationProcessor "android.arch.lifecycle:compiler:$arch_version"
-    kapt "android.arch.lifecycle:compiler:$arch_version"
-
-    //Android Beacon Library
-    compile "org.altbeacon:android-beacon-library:$android_beacon_library_version"
-
-    //Apache Math3
-    compile 'org.apache.commons:commons-math3:3.6.1'
+    implementation "android.arch.lifecycle:livedata:1.1.1"
+    implementation "android.arch.lifecycle:common-java8:1.1.1"
+    kapt "android.arch.lifecycle:compiler:1.1.1"
 
     //Gson
-    compile 'com.google.code.gson:gson:2.8.4'
+    implementation 'com.google.code.gson:gson:2.8.4'
 
-    testCompile 'junit:junit:4.12'
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation "com.squareup.retrofit2:converter-gson:2.4.0"
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compile 'com.squareup.retrofit2:retrofit:2.4.0'
-    compile "com.squareup.retrofit2:converter-gson:2.4.0"
+    //Weka
+    implementation project(":weka")
+
+    //Unit Tests
+    testImplementation 'junit:junit:4.12'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 }
 repositories {
     mavenCentral()
 }
+
