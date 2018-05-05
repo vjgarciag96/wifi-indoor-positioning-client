@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
@@ -38,7 +38,7 @@ class WifiDataSource : DataSource {
                 val scanResults = AccessPointMeasurementsMapper().mapList(wifiManager.scanResults)
                 accessPointMeasurementsLiveData.postValue(scanResults)
             }
-        }, 0, 5, TimeUnit.SECONDS)
+        }, 0, 2, TimeUnit.SECONDS)
 
         return accessPointMeasurementsLiveData
     }

@@ -1,11 +1,11 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.local.db
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.local.db
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.local.dao.WaypointsDao
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.local.dao.WaypointsDao
 
 /**
  * Created by victor on 25/04/18.

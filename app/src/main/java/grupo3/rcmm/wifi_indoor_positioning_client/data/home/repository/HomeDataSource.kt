@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import com.google.android.gms.maps.model.LatLng
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataSource
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.AccessPointMeasurement
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 

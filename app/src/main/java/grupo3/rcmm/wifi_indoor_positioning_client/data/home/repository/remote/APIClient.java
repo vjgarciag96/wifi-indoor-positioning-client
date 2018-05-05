@@ -1,8 +1,9 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.remote;
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.remote;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.remote.service.FingerprintingService;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

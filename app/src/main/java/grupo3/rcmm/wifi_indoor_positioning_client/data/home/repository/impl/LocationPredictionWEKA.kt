@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
@@ -9,7 +9,8 @@ import com.google.gson.reflect.TypeToken
 import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.AppThreadExecutor
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.MLMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.PositionClass
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.WifiAttribute
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.AccessPointAttribute
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.datasource.LocationPredictionDataSource
 import weka.classifiers.Classifier
 import weka.core.Attribute
 import weka.core.DenseInstance
@@ -42,10 +43,10 @@ class LocationPredictionWEKA(val context: Context) : LocationPredictionDataSourc
         }
 
         val gson = GsonBuilder().create()
-        val attributeType = object : TypeToken<List<WifiAttribute>>() {}.type
+        val attributeType = object : TypeToken<List<AccessPointAttribute>>() {}.type
         val classType = object : TypeToken<List<PositionClass>>() {}.type
 
-        val wifiAttributes: List<WifiAttribute> = gson.fromJson<List<WifiAttribute>>(attributesConfig, attributeType)
+        val wifiAttributes: List<AccessPointAttribute> = gson.fromJson<List<AccessPointAttribute>>(attributesConfig, attributeType)
         val positionClasses: List<PositionClass> = gson.fromJson<List<PositionClass>>(classesConfig, classType)
 
         for (attribute in wifiAttributes) {

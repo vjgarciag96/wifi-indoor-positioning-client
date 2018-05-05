@@ -1,8 +1,7 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.datasource
 
 import android.arch.lifecycle.LiveData
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataSource
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
 
 /**

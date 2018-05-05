@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.datasource
 
 import android.arch.lifecycle.LiveData
 import com.google.android.gms.maps.model.LatLng

@@ -1,11 +1,11 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.remote.APIClient
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.remote.APIClient
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.datasource.FingerprintingDataSource
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

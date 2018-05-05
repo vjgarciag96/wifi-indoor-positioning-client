@@ -9,11 +9,14 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataManager
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataSource
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.AccessPointMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.local.db.WaypointsDatabase
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.local.db.WaypointsDatabase
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.MLMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.RssiMeasurement
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.datasource.FingerprintingDataSource
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl.FingerprintAPI
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl.LocationPredictionWEKA
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl.WifiDataSource
 
 /**
  * Created by victor on 28/04/18.

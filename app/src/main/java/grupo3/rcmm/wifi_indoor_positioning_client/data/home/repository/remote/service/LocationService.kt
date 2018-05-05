@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.remote
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.remote.service
 
 import android.arch.lifecycle.LiveData
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Location

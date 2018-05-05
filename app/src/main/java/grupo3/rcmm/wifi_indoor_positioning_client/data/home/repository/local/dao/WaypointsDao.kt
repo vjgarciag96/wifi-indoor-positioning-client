@@ -1,4 +1,4 @@
-package grupo3.rcmm.wifi_indoor_positioning_client.data.home.local.dao
+package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.local.dao
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
