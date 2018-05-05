@@ -5,6 +5,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import android.os.Looper
 import android.support.annotation.NonNull
+import java.util.concurrent.ScheduledThreadPoolExecutor
 
 
 /**
@@ -28,19 +29,25 @@ public class AppThreadExecutor private constructor() {
         }
     }
 
-    private var diskIO: Executor? = null
-    private var mainThread: Executor? = null
+    private var diskIO: Executor
+    private var mainThread: Executor
+    private var scheduledThread: Executor
 
     init {
         diskIO = Executors.newSingleThreadExecutor()
         mainThread = MainThreadExecutor()
+        scheduledThread = ScheduledThreadPoolExecutor(2)
     }
 
-    fun diskIO(): Executor? {
+    fun diskIO(): Executor {
         return diskIO
     }
 
-    fun mainThread(): Executor? {
+    fun mainThread(): Executor {
         return mainThread
+    }
+
+    fun scheduledThread(): Executor{
+        return scheduledThread
     }
 }

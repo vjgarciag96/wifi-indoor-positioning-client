@@ -16,6 +16,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import grupo3.rcmm.wifi_indoor_positioning_client.R
+import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.AppThreadExecutor
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataManager
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
@@ -23,6 +24,7 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.HomeRepos
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 import grupo3.rcmm.wifi_indoor_positioning_client.ui.base.BasePresenter
 import grupo3.rcmm.wifi_indoor_positioning_client.ui.base.IPresenter
+import java.util.concurrent.ScheduledThreadPoolExecutor
 
 /**
  * Created by victor on 28/04/18.
@@ -56,17 +58,6 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 getView().hideAddMarkerButton()
                 getView().setViewTitle(getContext().getString(R.string.positioning))
                 getView().showPositioningButton()
-                val repository = getDataManager() as HomeRepository
-                val lifecycleOwner = getView() as LifecycleOwner
-                repository.getAccessPointMeasurements()
-                        .observe(lifecycleOwner,
-                                Observer {
-                                    repository.getPosition(it!!)
-                                            .observe(lifecycleOwner,
-                                                    Observer {
-                                                        getView().addMarker("User", it!!, false)
-                                                    })
-                                })
             }
             R.id.waypoints -> {
                 val getWaypointsObservable = (getDataManager() as HomeRepository).getWaypoints()
@@ -120,6 +111,21 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 .observe(getView() as LifecycleOwner, Observer {
                     getView().addMarker(it.toString(), position, true)
                 })
+    }
+
+    fun onPositioningButtonClicked(){
+        val repository = getDataManager() as HomeRepository
+        val lifecycleOwner = getView() as LifecycleOwner
+
+        repository.getAccessPointMeasurements()
+                .observe(lifecycleOwner,
+                        Observer {
+                            repository.getPosition(it!!)
+                                    .observe(lifecycleOwner,
+                                            Observer {
+                                                getView().setUserPosition(it!!)
+                                            })
+                        })
     }
 
     fun onMarkerClick(marker: Marker) {

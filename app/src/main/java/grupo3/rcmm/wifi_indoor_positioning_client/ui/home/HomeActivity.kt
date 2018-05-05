@@ -36,6 +36,8 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
 
     private lateinit var presenter: HomePresenter<HomeView>
 
+    private var userPosition: Marker? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -112,8 +114,10 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
 
     override fun createViewListeners() {
         add_marker_button.setOnClickListener(View.OnClickListener {
-            if (map != null)
-                presenter.onAddWaypointButtonClick(map.cameraPosition.target)
+            presenter.onAddWaypointButtonClick(map.cameraPosition.target)
+        })
+        positioning_button.setOnClickListener(View.OnClickListener {
+            presenter.onPositioningButtonClicked()
         })
     }
 
@@ -147,6 +151,17 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
                 .position(position)
                 .draggable(draggable)
                 .title(title))
+    }
+
+    override fun setUserPosition(position: LatLng) {
+        if (userPosition == null)
+            userPosition = map.addMarker(MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position_marker))
+                    .anchor(0.5F, 0.5F)
+                    .position(position)
+                    .title("Posicion actual"))
+        else
+            userPosition?.position = position
     }
 
     override fun deleteMarker(marker: Marker) = marker.remove()

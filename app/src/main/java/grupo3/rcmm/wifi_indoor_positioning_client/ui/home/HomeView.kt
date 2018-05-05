@@ -23,6 +23,7 @@ interface HomeView : BaseView {
     fun removeMarkerDragListener()
     fun addMarker(title: String, position: LatLng, draggable: Boolean)
     fun deleteMarker(marker: Marker)
+    fun setUserPosition(position: LatLng)
     fun showToast(message: String)
     fun showDeleteButton()
     fun hideDeleteButton()
