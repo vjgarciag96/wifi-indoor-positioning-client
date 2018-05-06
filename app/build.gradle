@@ -71,6 +71,9 @@ dependencies {
     //Weka
     implementation project(":weka")
 
+    //Socket IO
+    implementation 'com.github.nkzawa:socket.io-client:0.3.0'
+
     //Unit Tests
     testImplementation 'junit:junit:4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

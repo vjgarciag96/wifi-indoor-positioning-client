@@ -11,11 +11,13 @@ import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.AccessPointMea
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.local.db.WaypointsDatabase
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Location
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.MLMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.ml.RssiMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.datasource.FingerprintingDataSource
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl.FingerprintAPI
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl.LocationPredictionWEKA
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl.RegisterLocationAPI
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl.WifiDataSource
 
 /**
@@ -26,6 +28,7 @@ class HomeRepository(private val context: Context) : DataManager, HomeDataSource
     private var wifiDataSource: DataSource = WifiDataSource(context)
     private var fingerprintingDataSource: DataSource = FingerprintAPI()
     private var locationPredictionDataSource: DataSource = LocationPredictionWEKA(context)
+    private var registerLocationDataSource: DataSource = RegisterLocationAPI()
 
     override fun getAccessPointMeasurements(): LiveData<List<AccessPointMeasurement>> =
             (wifiDataSource as WifiDataSource).getAccessPointMeasurements()
@@ -76,5 +79,9 @@ class HomeRepository(private val context: Context) : DataManager, HomeDataSource
             measurementsMap.put(measurement.mac, RssiMeasurement(measurement.rssi.toDouble()))
         return (locationPredictionDataSource as LocationPredictionWEKA)
                 .getLocationPrediction(measurementsMap)
+    }
+
+    override fun registerPosition(position: Location): LiveData<Boolean> {
+        return(registerLocationDataSource as RegisterLocationAPI).sendLocation(position)
     }
 }

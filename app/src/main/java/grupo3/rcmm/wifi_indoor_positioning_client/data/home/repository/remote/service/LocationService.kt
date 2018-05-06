@@ -2,6 +2,7 @@ package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.remote.s
 
 import android.arch.lifecycle.LiveData
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Location
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -11,5 +12,5 @@ import retrofit2.http.POST
 interface LocationService {
 
     @POST("location")
-    fun postLocation(@Body location: Location): LiveData<Void>
+    fun postLocation(@Body location: Location): Call<Void>
 }

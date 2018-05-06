@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.LatLng
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataSource
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.AccessPointMeasurement
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Location
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 
 /**
@@ -22,4 +23,5 @@ interface HomeDataSource : DataSource {
     fun addFingerprint(fingerprint: Fingerprinting): LiveData<Boolean>
 
     fun getPosition(measurements: List<AccessPointMeasurement>): LiveData<LatLng>
+    fun registerPosition(position: Location): LiveData<Boolean>
 }

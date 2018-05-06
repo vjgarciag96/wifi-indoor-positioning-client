@@ -20,6 +20,7 @@ import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.AppThreadExecuto
 import grupo3.rcmm.wifi_indoor_positioning_client.data.base.DataManager
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprint
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Location
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.HomeRepository
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Waypoint
 import grupo3.rcmm.wifi_indoor_positioning_client.ui.base.BasePresenter
@@ -113,7 +114,7 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                 })
     }
 
-    fun onPositioningButtonClicked(){
+    fun onPositioningButtonClicked() {
         val repository = getDataManager() as HomeRepository
         val lifecycleOwner = getView() as LifecycleOwner
 
@@ -124,6 +125,12 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                                     .observe(lifecycleOwner,
                                             Observer {
                                                 getView().setUserPosition(it!!)
+                                                repository.registerPosition(Location(it.latitude, it.longitude))
+                                                        .observe(lifecycleOwner, Observer { 
+                                                            when(it){
+                                                                false -> getView().showToast(getContext().getString(R.string.register_position_error))
+                                                            }
+                                                        })
                                             })
                         })
     }

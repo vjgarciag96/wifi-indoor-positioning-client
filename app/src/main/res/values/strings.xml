@@ -6,4 +6,5 @@
     <string name="permission_denied">Debes conceder los permisos de ubicación para escanear los puntos de acceso</string>
     <string name="fingerprint_success">Fingerprinting registrado con éxito</string>
     <string name="fingerprint_error">Error registrando el fingerprint</string>
+    <string name="register_position_error">Hay problemas registrando la posición del usuario</string>
 </resources>

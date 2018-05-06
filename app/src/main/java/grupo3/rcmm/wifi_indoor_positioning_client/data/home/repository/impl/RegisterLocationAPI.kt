@@ -3,26 +3,32 @@ package grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.impl
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Fingerprinting
+import com.github.nkzawa.socketio.client.IO
+import grupo3.rcmm.wifi_indoor_positioning_client.common.thread.AppThreadExecutor
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.model.Location
+import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.datasource.RegisterLocationDataSource
 import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.remote.APIClient
-import grupo3.rcmm.wifi_indoor_positioning_client.data.home.repository.datasource.FingerprintingDataSource
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-/**
- * Created by victor on 4/05/18.
- */
-class FingerprintAPI : FingerprintingDataSource {
+class RegisterLocationAPI : RegisterLocationDataSource {
 
     companion object {
-        private val TAG = "FingerprintAPI"
+        private val TAG = "RegisterLocationAPI"
     }
 
-    override fun sendFingerprint(fingerprint: Fingerprinting): LiveData<Boolean> {
+    override fun sendLocation(location: Location): LiveData<Boolean> {
         val resultLiveData: MutableLiveData<Boolean> = MutableLiveData()
-        APIClient.getFingerprintingService()
-                .postFingerprint(fingerprint)
+        AppThreadExecutor.instance.diskIO().execute(Runnable {
+            val socket = IO.socket("http://192.168.1.130:6969")
+            if (!socket.connected())
+                socket.connect()
+            socket.emit("location", location.lat.toString() + "," + location.lng.toString())
+        })
+
+        APIClient.getLocationService()
+                .postLocation(location)
                 .enqueue(object : Callback<Void> {
                     override fun onFailure(call: Call<Void>?, t: Throwable?) {
                         if (t?.message != null)
