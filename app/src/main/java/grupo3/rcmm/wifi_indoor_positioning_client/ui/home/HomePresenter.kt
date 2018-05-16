@@ -103,7 +103,7 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
         getView().disableMapToolbar()
         getView().drawFloorPlan()
         //getView().moveMapCameraTo(LatLng(39.47896890365607, -6.34215496480465))
-        getView().moveMapCameraTo(LatLng(39.469202, -6.381126))
+        getView().moveMapCameraTo(LatLng(39.478281372796744, -6.341853132471443))
     }
 
     fun onAddWaypointButtonClick(position: LatLng) {
@@ -126,8 +126,8 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                                             Observer {
                                                 getView().setUserPosition(it!!)
                                                 repository.registerPosition(Location(it.latitude, it.longitude))
-                                                        .observe(lifecycleOwner, Observer { 
-                                                            when(it){
+                                                        .observe(lifecycleOwner, Observer {
+                                                            when (it) {
                                                                 false -> getView().showToast(getContext().getString(R.string.register_position_error))
                                                             }
                                                         })
@@ -148,8 +148,9 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                                 getView().showToast(getContext().getString(R.string.permission_denied))
 
                         override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                            (getDataManager() as HomeRepository)
+                            val getAccessPointMeasurementsObservable = (getDataManager() as HomeRepository)
                                     .getAccessPointMeasurements()
+                            getAccessPointMeasurementsObservable
                                     .observe(getView() as LifecycleOwner,
                                             Observer {
                                                 Log.d(TAG, "scanned " + it?.size + " access points...")
@@ -163,7 +164,10 @@ class HomePresenter<V : HomeView> : BasePresenter<V>, IPresenter<V> {
                                                         .addFingerprint(Fingerprinting(fingerprinting))
                                                         .observe(getView() as LifecycleOwner, Observer {
                                                             when (it) {
-                                                                true -> getView().showToast(getContext().getString(R.string.fingerprint_success))
+                                                                true -> {
+                                                                    getView().showToast(getContext().getString(R.string.fingerprint_success))
+                                                                    getAccessPointMeasurementsObservable.removeObservers(getView() as LifecycleOwner)
+                                                                }
                                                                 false -> getView().showToast(getContext().getString(R.string.fingerprint_error))
                                                             }
                                                         })

@@ -15,6 +15,9 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
+    sourceSets {
+
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -25,6 +28,21 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    flavorDimensions 'main'
+    productFlavors {
+        quercuslab {
+            applicationId 'rcmm.quercuslab'
+            dimension 'main'
+        }
+        home {
+            applicationId 'rcmm.home'
+            dimension 'main'
+        }
+        rcmm {
+            applicationId 'rcmm.edificioInformatica'
+            dimension 'main'
+        }
+    }
 }
 
 kapt {
@@ -32,52 +50,39 @@ kapt {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
     //Android
     implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation "com.android.support:design:$android_libraries_version"
-
-
     //Google Maps API
     implementation "com.google.android.gms:play-services-maps:$play_services_version"
     implementation "com.google.android.gms:play-services-base:$play_services_version"
     implementation "com.google.android.gms:play-services-location:$play_services_version"
-
     //Room
-    implementation "android.arch.persistence.room:runtime:1.0.0"
+    implementation 'android.arch.persistence.room:runtime:1.0.0'
     kapt "android.arch.persistence.room:compiler:1.0.0"
-
-
     //Dexter
     implementation "com.karumi:dexter:$dexter_version"
-
     //Lifecycle
-    implementation "android.arch.lifecycle:livedata:1.1.1"
-    implementation "android.arch.lifecycle:common-java8:1.1.1"
+    implementation 'android.arch.lifecycle:livedata:1.1.1'
+    implementation 'android.arch.lifecycle:common-java8:1.1.1'
     kapt "android.arch.lifecycle:compiler:1.1.1"
-
     //Gson
     implementation 'com.google.code.gson:gson:2.8.4'
-
     //Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation "com.squareup.retrofit2:converter-gson:2.4.0"
-
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     //Weka
-    implementation project(":weka")
-
+    implementation project(':weka')
     //Socket IO
     implementation 'com.github.nkzawa:socket.io-client:0.3.0'
-
     //Unit Tests
     testImplementation 'junit:junit:4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-
 }
 repositories {
     mavenCentral()

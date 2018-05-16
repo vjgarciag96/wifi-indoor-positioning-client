@@ -21,7 +21,7 @@ class RegisterLocationAPI : RegisterLocationDataSource {
     override fun sendLocation(location: Location): LiveData<Boolean> {
         val resultLiveData: MutableLiveData<Boolean> = MutableLiveData()
         AppThreadExecutor.instance.diskIO().execute(Runnable {
-            val socket = IO.socket("http://192.168.1.130:6969")
+            val socket = IO.socket("http://qapps.unex.es:7779")
             if (!socket.connected())
                 socket.connect()
             socket.emit("location", location.lat.toString() + "," + location.lng.toString())

@@ -92,6 +92,14 @@ class HomeActivity : AppCompatActivity(), HomeView, OnMapReadyCallback {
     }
 
     override fun drawFloorPlan() {
+//        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.edificio_inv)
+//        map.addGroundOverlay(GroundOverlayOptions()
+//                .image(BitmapDescriptorFactory.fromBitmap(bitmap))
+//                .bearing(15.811599435836836F + 270F)
+//                .transparency(0.5F)
+//                .position(LatLng(39.478281372796744, -6.341853132471443),
+//                        12.27700338042347F,
+//                        31.498005290109177F))
         val bitmap = BitmapFactory.decodeResource(resources, R.drawable.plano)
         map.addGroundOverlay(GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromBitmap(bitmap))

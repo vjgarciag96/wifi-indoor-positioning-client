@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
 
-    private static final String BASE_URL = "http://192.168.1.130:6969/";
+    private static final String BASE_URL = "http://qapps.unex.es:7779/";
 
     private static Retrofit retrofit;
 
